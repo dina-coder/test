@@ -6,7 +6,7 @@ const MoodChecker=(props)=> {
   return (
     <div className={style.wrapper}>
       <label className={style.container}>{props.name}
-        <input type="checkbox"  onChange={()=>props.func(props.name)}/>
+        <input type="checkbox" onClick={()=>props.funcOnCheckmarks(props.name)}/>
         <span className={style.checkmark}></span>
       </label>
     </div>

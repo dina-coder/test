@@ -1,22 +1,44 @@
-.container{
-    margin-right: 2%;
-}
-.wrapper{
-    height: 50vh;
-    width: 20vw;
+@mixin container {
+    width: 240px;
     overflow-y: scroll;
     border: 3px solid #e8e8e8;
-    font-size: 16px;
+    font-size: 12px;
     font-weight: 500;
-    outline:none;
+    padding-left:20px;
+    margin-bottom: 18px;
+    margin-top: 0px;
 
+}
+.container{
+     width: 280px;
+
+}
+.BigContainer{
+    height: 565px;
+    @include container;
+
+
+}
+.SmallContainer{
+    height: 255px;
+    @include container;
 }
 
 .listName{
     background-color: #e8e8e8;
-    width: 20vw;
-    height: 30px;
+    width: 266px;
     font-weight: 700;
     text-align: center;
     padding-top: 5px;
+    padding-bottom: 5px;
+}
+.ElementOfList{
+    list-style-type: none;
+    font-weight: 400;
+    font-size: 14px;
+    cursor: default;
+
+}
+.ActiveElementOfList{
+    background-color:rgb(227, 227, 243);
 }

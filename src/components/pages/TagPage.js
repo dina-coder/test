@@ -1,34 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import style from '../../assets/style/TagPage.module.scss';
 import Header from '../elements/Header';
-import MoodChecker from '../core/MoodChecker';
-import Column from '../core/Column';
+import Button from '../core/Button';
+import Column from '../elements/Column';
 import Comment from '../core/Comment';
 import { connect } from 'react-redux';
-import {Get_Mood_Async, Get_Object_List_Async, Get_Modificator_List_Async, Get_Action_List_Async, 
-  Get_Phrase_Async, Get_Add_On_List_Async} from '../../redux/reducers/TagReducer/TagReducer'
-import Column1 from '../core/Column1';
+import { Post_Counter, Get_Data_Async, Post_Data } from '../../redux/reducers/TagReducer/TagReducer'
+import Counter from '../core/Counter';
 
-const TagPage=(props)=> {
-  useEffect(()=>{
-    props.Get_Mood_Async()},[])
-  useEffect(()=>{
-    props.Get_Object_List_Async()},[])
-  useEffect(()=>{
-    props.Get_Modificator_List_Async()},[])
-  useEffect(()=>{
-    props.Get_Action_List_Async()},[])
-  useEffect(()=>{
-    props.Get_Add_On_List_Async()},[])
-  useEffect(()=>{
-    props.Get_Phrase_Async()},[])
-
-  const [object, SetObject]=useState("");
-  const [modificator, SetModificator]=useState("");
-  const [action, SetAction]=useState("");
-  const [add_on, SetAdd_On]=useState("");
-  const [checkmarks, SetCheckmarks]=useState([]);
-  const [comment, SetComment]=useState("");
+const TagPage = (props) => {
+  useEffect(() => {
+    props.Get_Data_Async()
+  }, [])
+   const [object, SetObject]=useState("");
+   const [modificator, SetModificator]=useState("");
+   const [negative_modificator, SetNegativeModificator]=useState("");
+   const [action, SetAction]=useState("");
+   const [add_on, SetAdd_On]=useState("");
+   const [checkmarks]=useState([]);
+   const [comment, SetComment]=useState("");
+   const [channel, SetChannel]=useState("");
   const IsChecmarkClicked=(name)=>{
     if (checkmarks.indexOf(name)!==-1){
       checkmarks.splice(checkmarks.indexOf(name), 1)
@@ -38,46 +29,40 @@ const TagPage=(props)=> {
   const CommentContent=(e)=>{
     SetComment(e.currentTarget.value);
   }
-  const PutinFunction=()=>{
-    SetObject('');
-    SetModificator('');
-    SetAction('');
-    SetAdd_On('');
-    SetCheckmarks([]);
-    SetComment('');
-  }
-  const AllMoods=props.mood.map(x=><MoodChecker func={IsChecmarkClicked} name={x.mood}/>);
-  const arr={
-    bank: [],
-    rere:[],
-    aaa:['eee', 'fff', 'sss'],
-    qqq: [],
-    ddd:['fgg', 'sds', 'wew']
+  const TagNext = () => {
+    props.Post_Counter();
+    props.Post_Data(checkmarks);
   }
   return (
     <div className={style.wrapper}>
-      <Header object={object} modificator={modificator} action={action} add_on={add_on} checkmarks={checkmarks}
-       phrase={props.phrase.phrase} comment={comment} Get_Phrase_Async={props.Get_Phrase_Async} PutinFunction={PutinFunction}/>
-      {AllMoods}
+      <Counter counter={props.counter} />
+      <Header funcOnChannel={SetChannel} funcOnCheckmarks={IsChecmarkClicked} phrase={props.phrase} checkmarks={props.checkboxes} channel={props.channel[0]} />
       <div className={style.ListContainer}>
-      {/* <Column name='Object' func={SetObject} object={props.object_list}/> */}
-      <Column name='Modificator' func={SetModificator} object={props.modificator}/>
-      <Column name='Action' func={SetAction} object={props.action}/>
-      <Column name='Add-on' func={SetAdd_On} object={props.add_on}/>
-      <Column1 name='Test' func={SetObject} object={arr}/>
+        <Column style="big" name='Объект' list={props.object_list[0]} currentValue = {object} func={SetObject} />
+      <div >
+          <Column style="small" name='Модификатор отрицания'  currentValue = {modificator} func={SetModificator} list={props.modificator[0]} />
+          <Column style="small" name='Модификатор уточнения'  currentValue = {negative_modificator} func={SetNegativeModificator} list={props.modificator[0]} />
+        </div>
+        <Column style="big" name='Действие'  currentValue = {action} func={SetAction} list={props.action[0]} />
+        <Column style="big" name='Дополнение'  currentValue = {add_on} func={SetAdd_On} list={props.add_on[0]} />
       </div>
-      <Comment func={CommentContent} />
+      <div className={style.ListContainer}>
+        <Comment currentValue={comment} func={CommentContent}/>
+        <Button  func={TagNext} name="Отправить" />
       </div>
+    </div>
   );
 }
-const mapStateToProps=(state)=>({
-  mood: state.TagReducer.mood,
+const mapStateToProps = (state) => ({
+  checkboxes: state.TagReducer.checkboxes,
+  channel: state.TagReducer.channel,
   object_list: state.TagReducer.object_list,
-  modificator:state.TagReducer.modificator,
-  action:state.TagReducer.action,
-  add_on:state.TagReducer.add_on,
-  phrase: state.TagReducer.phrase
+  negative_modificator: state.TagReducer.negative_modificator,
+  modificator: state.TagReducer.modificator,
+  action: state.TagReducer.action,
+  add_on: state.TagReducer.add_on,
+  phrase: state.TagReducer.phrase,
+  counter: state.TagReducer.counter
 })
 
-export default connect(mapStateToProps, {Get_Mood_Async, Get_Object_List_Async, Get_Modificator_List_Async, 
-  Get_Action_List_Async, Get_Add_On_List_Async, Get_Phrase_Async})(TagPage);
+export default connect(mapStateToProps, {  Post_Counter,  Get_Data_Async, Post_Data })(TagPage);

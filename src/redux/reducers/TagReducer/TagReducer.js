@@ -1,90 +1,72 @@
-import { LOG_IN, GET_MOOD, GET_OBJECT_LIST, GET_MODIFICATOR_LIST, GET_ACTION_LIST, GET_ADD_ON_LIST, GET_PHRASE } from "./constants";
-import { api } from "../../../API/api";
+import {POST_COUNTER, GET_DATA } from "./constants";
+import data from '../../../data.json'
 
 let initialState = {
-    isAuth: false,
-    isFetching:false,
-    phrase:{},
-    mood:[],
-    object_list:[], 
-    modificator:[],
-    action:[],
-    add_on:[]
+    phrase: "",
+    checkboxes: [],
+    channel: [],
+    object_list: [],
+    negative_modificator: [],
+    modificator: [],
+    action: [],
+    add_on: [],
+    comment: [],
+    counter: 0,
+    isAuth: false
 }
 
 const TagReducer = (state = initialState, action) => {
     switch (action.type) {
-        case LOG_IN: {
-            return { ...state, isAuth: true }
+        case POST_COUNTER: {
+            return { ...state, counter: state.counter + 1 }
         }
-        case GET_MOOD: {
-            return {...state, mood:action.payload}
+        case GET_DATA: {
+            return {
+                ...state,
+                checkboxes: action.payload.catalog.entities[0].fields.filter(x => x.type.name === "bool"),
+                channel: action.payload.catalog.entities[0].fields.filter(x => x.name === "\u041a\u0430\u043d\u0430\u043b"),
+                object_list: action.payload.catalog.entities[0].fields.filter(x => x.name === "\u041e\u0431\u044a\u0435\u043a\u0442"),
+                negative_modificator: action.payload.catalog.entities[0].fields.filter(x => x.name === "\u041c\u043e\u0434\u0438\u0444. \u043e\u0442\u0440\u0438\u0446\u0430\u043d\u0438\u0435"),
+                modificator: action.payload.catalog.entities[0].fields.filter(x => x.name === "\u041c\u043e\u0434\u0438\u0444. \u0423\u0442\u043e\u0447\u043d\u0435\u043d\u0438\u0435"),
+                action: action.payload.catalog.entities[0].fields.filter(x => x.name === "\u0414\u0435\u0439\u0441\u0442\u0432\u0438\u0435 (\u0441\u043a\u0430\u0437\u0443\u0435\u043c\u043e\u0435)"),
+                add_on: action.payload.catalog.entities[0].fields.filter(x => x.name === "\u0414\u043e\u043f\u043e\u043b\u043d\u0435\u043d\u0438\u0435"),
+                phrase: action.payload.phrase
+            }
         }
-        case GET_OBJECT_LIST: {
-            return {...state, object_list: action.payload}
-        }
-        case GET_MODIFICATOR_LIST: {
-            return {...state, modificator:action.payload}
-        }
-        case GET_ACTION_LIST: {
-            return {...state, action:action.payload}
-        }
-        case GET_ADD_ON_LIST: {
-            return {...state, add_on:action.payload}
-        }
-        case GET_PHRASE:{
-            return {...state, phrase: action.payload[0]}
-        }
+
         default:
             return state
     }
 }
 export default TagReducer
 
+//action creator
 
-export const Log_in = () => {
-    return ({type:LOG_IN})
-    }
-export const Get_Mood = (payload) => {
-    return ({type:GET_MOOD, payload})
-    }
-export const Get_Object_List = (payload) => {
-     return ({type:GET_OBJECT_LIST, payload})
-    }
-export const Get_Modificator_List = (payload) => {
-   return ({type:GET_MODIFICATOR_LIST, payload})
-    }
-export const Get_Action_List = (payload) => {
-   return ({type:GET_ACTION_LIST, payload})
-    }
-export const Get_Add_On_List = (payload) => {
-   return ({type:GET_ADD_ON_LIST, payload})
-    }
-export const Get_Phrase=(payload)=>{
-    return ({type:GET_PHRASE, payload})
+export const Post_Counter = () => {
+    return ({ type: POST_COUNTER })
 }
-export const Get_Mood_Async = () => async (dispatch) => {
-    let response = await api.getMood()
-    dispatch(Get_Mood(response))
-}
-export const Get_Object_List_Async = () => async (dispatch) => {
-    let response = await api.getObjectList()
-    dispatch(Get_Object_List(response))
-}
-export const Get_Modificator_List_Async = () => async (dispatch) => {
-    let response = await api.getModificatorList()
-    dispatch(Get_Modificator_List(response))
-}
-export const Get_Action_List_Async = () => async (dispatch) => {
-    let response = await api.getActionList()
-    dispatch(Get_Action_List(response))
-}
-export const Get_Add_On_List_Async = () => async (dispatch) => {
-    let response = await api.getAddOnList()
-    dispatch(Get_Add_On_List(response))
+export const Get_Data = (payload) => {
+    return ({ type: GET_DATA, payload })
 }
 
-export const Get_Phrase_Async = () => async (dispatch) => {
-    let response = await api.getPhrase()
-    dispatch(Get_Phrase(response))
+
+//thunk
+
+export const Get_Data_Async = () => dispatch => {
+    const getTask = new Promise(resolve => {
+        setTimeout(() => resolve({ catalog: data, phrase: "тексттекст" }), 1000)
+    })
+
+    getTask.then(data => {
+        dispatch(Get_Data(data))
+    })
+}
+
+export const Post_Data = (data) => () => {
+    new Promise(resolve => {
+        setTimeout(()=>resolve(setResult(data), 1000))
+    })
+}
+export const setResult=(data)=>{
+    console.log(data);
 }
